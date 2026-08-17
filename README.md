@@ -1,38 +1,35 @@
-# Seattle Logistics and Supply Chain Pipeline: Operations and Safety Analysis
+# Seattle Logistics & Supply Chain Analysis
 
-## Project Overview
-Welcome to my supply chain data project! The goal of this analysis was to investigate operational bottlenecks and safety hazards for delivery routes in the Greater Seattle area. To do this, I built an end-to-end ETL (Extract, Transform, Load) pipeline to merge logistics records, historical weather data, and safety incident reports into a single, clean dataset. 
+This is an independent project I built to look into delivery delays and safety incidents for trucking routes in and around Seattle. I wanted practice building a real ETL pipeline end to end, not just working with data that's already clean and ready to go.
 
-From there, I visualized the data to find actionable ways to improve delivery efficiency and reduce the financial impact of safety incidents.
+**Tools:** Python (Pandas, Datetime), SQLite, Tableau, VS Code
 
-**Tools Used:** Python (Pandas, Datetime), SQLite (for local data storage), Tableau, and VS Code.
+## Data source
 
-## Data Source
-The core logistics data used in this project was sourced from the **Logistics Operations Database** on Kaggle, created by Yogape Rodriguez. The dataset is a high-quality, realistic simulation of a Class 8 trucking company's daily operations spanning from 2022 to 2024. External historical weather data for the Seattle region was sourced independently and integrated into the pipeline for correlational analysis.
+The core logistics data came from the "Logistics Operations Database" on Kaggle (created by Yogape Rodriguez) — it's a simulated dataset modeled on a real Class 8 trucking company's operations from 2022–2024. I sourced historical Seattle-area weather data separately and merged it in myself.
 
-## Key Business Insights and Recommendations
-You can view the full interactive Tableau dashboard here: [https://public.tableau.com/views/LogisticsProject_17844983969490/Dashboard1?:language=en-US&:sid=&:redirect=auth&:display_count=n&:origin=viz_share_link]
+## What I found
 
-* **The 3:00 AM Operational Bottleneck:** The data shows that truck detention times (delays) spike significantly in the middle of the night, with trucks waiting an average of nearly 120 minutes around 3:00 AM. 
-  * *Recommendation:* I recommend reviewing warehouse staffing levels and dock availability during the night shift to clear this bottleneck and reduce costs associated with idle trucks.
-* **The True Cost of Incidents:** While minor accidents happen frequently, DOT Violations are actually the most expensive incident type on average, costing operations over $14,200 per occurrence. 
-  * *Recommendation:* Reallocating a portion of the safety training budget specifically toward DOT compliance and equipment pre-checks could help mitigate these high-cost penalties.
+Dashboard:https://public.tableau.com/app/profile/zhanara.zamirova/viz/LogisticsProject_17844983969490/Dashboard1
 
-## The ETL Pipeline
-Here is a quick look at how I prepared the data for analysis:
+- **Truck detention times spike overnight.** Delays jump to almost 120 minutes on average around 3 AM. My guess is this points to a staffing or dock-availability gap during the night shift, though it'd be worth someone actually checking on the ground before assuming that.
+- **DOT violations are the most expensive incident type**, averaging over $14,200 per occurrence — higher than accidents or equipment damage. Shifting more of the safety training budget toward DOT compliance specifically might do more than spreading it evenly across incident types.
 
-1. **Extract and Filter:** I started with large-scale national datasets (routes, loads, and delivery events) and used Pandas to filter operations exclusively to Seattle-bound or Seattle-originating trips.
-2. **Transform and Time-Align:** I converted the raw delivery timestamps into standard Pandas datetime objects and rounded them to the nearest hour. This step was crucial for performing an accurate join with the hourly weather data.
-3. **Merge and Preserve Baseline:** I used a left join to append the safety incident reports to the master delivery table. This ensured that successful, incident-free deliveries were preserved as a baseline, allowing for accurate incident rate calculations later on.
-4. **Load:** Finally, I used Pandas and SQLite3 to programmatically generate a local database file and store the final dataset for future querying.
+## How the pipeline works
 
-## Technical Note on Weather Data 
-Going into this project, my initial hypothesis was that adverse weather would be a primary driver of delivery delays and accidents in Seattle. However, after successfully integrating the historical weather data, the exploratory data analysis (EDA) revealed a null result. Because the Kaggle dataset is a simulation, the delivery events were not mathematically tied to actual historical weather patterns, resulting in no correlation.
+1. Filtered national logistics data down to Seattle-only routes.
+2. Converted delivery timestamps to datetime objects and rounded them to the nearest hour so they'd line up with the hourly weather data.
+3. Used a left join to attach safety incidents to the full delivery table — this mattered because most deliveries don't have an incident, and an inner join here would've silently dropped every clean trip.
+4. Loaded the final dataset into SQLite so I could query it with SQL, not just filter it in Pandas.
 
-Because the weather metrics did not highlight an actionable root cause, I intentionally excluded them from the final Tableau dashboard to keep the focus on the internal operational factors that management can actually control.
+## A note on the weather data
 
-## Repository Structure
-* `/data`: The raw `.csv` files used for the initial extraction. (Note: some larger files were excluded due to size limits).
-* `/scripts`: My Python ETL scripts (`merge.py`, `merge_incidents.py`, `load_to_sql.py`).
-* `/database`: The final SQLite database file.
+Going in, I actually expected weather to be a real factor in delays. It wasn't. Since the Kaggle dataset is simulated, delivery events weren't actually tied to real historical weather patterns, so there was nothing to find. I left weather out of the final dashboard since it wasn't pointing to anything actionable — but it's also a big part of why I think this project would look different with real-world data instead of a simulated dataset.
+
+## Repo structure
+
+- `/data` — raw CSVs (some larger files excluded for size)
+- `/scripts` — `merge.py`, `merge_incidents.py`, `load_to_sql.py`
+- `/database` — final SQLite database
+- `/dashboard` — Tableau screenshots
 * `/dashboard`: Screenshots of the final Tableau visualizations.
