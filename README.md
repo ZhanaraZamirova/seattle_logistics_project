@@ -32,4 +32,3 @@ Going in, I actually expected weather to be a real factor in delays. It wasn't. 
 - `/scripts` — `merge.py`, `merge_incidents.py`, `load_to_sql.py`
 - `/database` — final SQLite database
 - `/dashboard` — Tableau screenshots
-* `/dashboard`: Screenshots of the final Tableau visualizations.
